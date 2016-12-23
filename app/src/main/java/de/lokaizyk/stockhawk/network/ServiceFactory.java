@@ -5,7 +5,10 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import java.util.concurrent.TimeUnit;
 
 import de.lokaizyk.stockhawk.BuildConfig;
+import de.lokaizyk.stockhawk.network.api.YahooApi;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -56,6 +59,21 @@ public class ServiceFactory<T> {
         return new OkHttpClient.Builder()
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE))
                 .addNetworkInterceptor(new StethoInterceptor())
+                .addInterceptor(chain -> {
+                    Request request = chain.request();
+                    HttpUrl url = request.url();
+                    url = url.newBuilder()
+                            .addQueryParameter(YahooApi.PARAM_FORMAT, YahooApi.VALUE_FORMAT_JSON)
+                            .addQueryParameter(YahooApi.PARAM_DIAGNOSTICS, YahooApi.VALUE_DIAGNOSTICS_TRUE)
+                            .addQueryParameter(YahooApi.PARAM_ENV, YahooApi.VALUE_ENV_STORE)
+                            .addQueryParameter(YahooApi.PARAM_CALLBACK, YahooApi.VALUE_CALLBACK_EMPTY)
+                            .build();
+                    Request.Builder requestBuilder = request.newBuilder()
+                            .url(url);
+
+                    Request changedRequest = requestBuilder.build();
+                    return chain.proceed(changedRequest);
+                })
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .build();
