@@ -1,24 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-
+        <variable
+            name="mainActivity"
+            type="de.lokaizyk.stockhawk.ui.activities.MainActivity"/>
     </data>
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="de.lokaizyk.stockhawk.ui.activities.MainActivity">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"/>
-    </RelativeLayout>
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/stockList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:items="@{mainActivity.mStockItems}"
+                app:itemClickListener="@{mainActivity}"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                app:fabSize="normal"
+                android:src="@drawable/ic_add_white_24dp"
+                android:onClick="@{() -> mainActivity.addSymbol()}"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
 </layout>
 

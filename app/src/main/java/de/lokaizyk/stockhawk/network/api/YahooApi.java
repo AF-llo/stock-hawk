@@ -35,16 +35,14 @@ public interface YahooApi {
 
     String INITIAL_SYMBOL_AAPL = "AAPL";
 
-    String INITIAL_SYMBOL_GOOG = "AAPL";
+    String INITIAL_SYMBOL_GOOG = "GOOG";
 
-    String INITIAL_SYMBOL_MSFT = "AAPL";
+    String INITIAL_SYMBOL_MSFT = "MSFT";
 
-    String INITIAL_SYMBOL_YHOO = "AAPL";
+    String INITIAL_SYMBOL_YHOO = "YHOO";
 
     // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("AAPL","GOOG","MSFT","YHOO")&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys&callback=
 
-    // TODO: 22.10.16 add response model
-    // TODO: 22.10.16 add format string to request with different values
     @GET(METHOD_YQL)
     Observable<QueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
 

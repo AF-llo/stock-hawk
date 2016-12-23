@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="de.lokaizyk.stockhawk.R"/>
+        <import type="de.lokaizyk.stockhawk.logic.StockProvider"/>
+        <variable
+            name="stockItem"
+            type="de.lokaizyk.stockhawk.logic.model.StockItemViewModel"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_hight"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/stock_symbol"
+            style="@style/StockSymbolTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|center_vertical"
+            android:text="@{stockItem.symbol}"
+            tools:text="GOOG"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/bid_price"
+                style="@style/BidPriceTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/spacing_s"
+                android:paddingLeft="@dimen/spacing_s"
+                android:text="@{stockItem.price}"
+                tools:text="1000.00"/>
+
+            <TextView
+                android:id="@+id/change"
+                style="@style/PercentChangeTextStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/spacing_xs"
+                android:paddingRight="@dimen/spacing_xs"
+                android:text="@{StockProvider.showPercent ? stockItem.percentChange : stockItem.change}"
+                app:backgroundDrawable="@{stockItem.isUp ? R.drawable.percent_change_pill_green : R.drawable.percent_change_pill_red}"
+                tools:text="100%"
+                tools:background="@drawable/percent_change_pill_green"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

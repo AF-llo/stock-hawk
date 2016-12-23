@@ -5,4 +5,5 @@ package de.lokaizyk.stockhawk.network.model;
  */
 
 public class QueryResponse {
+    // TODO: 23.12.16
 }
