@@ -11,7 +11,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -45,7 +44,6 @@ public class ServiceFactory<T> {
             }
         }
         return new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(mClient)
                 .baseUrl(mBaseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -64,7 +62,7 @@ public class ServiceFactory<T> {
                     HttpUrl url = request.url();
                     url = url.newBuilder()
                             .addQueryParameter(YahooApi.PARAM_FORMAT, YahooApi.VALUE_FORMAT_JSON)
-                            .addQueryParameter(YahooApi.PARAM_DIAGNOSTICS, YahooApi.VALUE_DIAGNOSTICS_TRUE)
+                            .addQueryParameter(YahooApi.PARAM_DIAGNOSTICS, YahooApi.VALUE_DIAGNOSTICS_FALSE)
                             .addQueryParameter(YahooApi.PARAM_ENV, YahooApi.VALUE_ENV_STORE)
                             .addQueryParameter(YahooApi.PARAM_CALLBACK, YahooApi.VALUE_CALLBACK_EMPTY)
                             .build();

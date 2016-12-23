@@ -1,9 +1,9 @@
 package de.lokaizyk.stockhawk.network.api;
 
 import de.lokaizyk.stockhawk.network.model.QueryResponse;
+import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 /**
  * Created by lars on 22.10.16.
@@ -25,6 +25,8 @@ public interface YahooApi {
 
     String VALUE_DIAGNOSTICS_TRUE = "true";
 
+    String VALUE_DIAGNOSTICS_FALSE = "true";
+
     String PARAM_ENV = "env";
 
     String VALUE_ENV_STORE = "store://datatables.org/alltableswithkeys";
@@ -44,7 +46,7 @@ public interface YahooApi {
     // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("AAPL","GOOG","MSFT","YHOO")&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys&callback=
 
     @GET(METHOD_YQL)
-    Observable<QueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
+    Call<QueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
 
     class SymbolBuilder {
 
