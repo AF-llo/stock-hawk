@@ -3,10 +3,11 @@ package de.lokaizyk.stockhawk.network.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by lars on 23.12.16.
+ * Created by lars on 25.12.16.
  */
 
-public class Query {
+public class SingleQuery {
+
 
     @SerializedName("count")
     private Integer count;
@@ -18,7 +19,7 @@ public class Query {
     private String lang;
 
     @SerializedName("results")
-    private Results results;
+    private SingleResult results;
 
     public Integer getCount() {
         return count;
@@ -44,11 +45,11 @@ public class Query {
         this.lang = lang;
     }
 
-    public Results getResults() {
+    public SingleResult getResults() {
         return results;
     }
 
-    public void setResults(Results results) {
+    public void setResults(SingleResult results) {
         this.results = results;
     }
 

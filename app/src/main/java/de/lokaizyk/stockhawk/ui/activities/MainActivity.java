@@ -4,11 +4,16 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import de.lokaizyk.stockhawk.R;
+import de.lokaizyk.stockhawk.app.service.StockIntentService;
+import de.lokaizyk.stockhawk.app.service.StockTaskService;
 import de.lokaizyk.stockhawk.databinding.ActivityMainBinding;
 import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
@@ -25,9 +30,19 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: 23.12.16 initialize task to update data
 
-        updateContent();
+        boolean isConnected = NetworkUtil.isConnected(this);
+        if (savedInstanceState == null){
+            // Run the initialize task service so that some stocks appear upon an empty database
+            if (isConnected){
+                StockIntentService.initialize(this);
+            } else{
+                NetworkUtil.noNetworkToast(this);
+            }
+        }
+        if (isConnected) {
+            StockTaskService.runPeriodic(this);
+        }
     }
 
     @Override
@@ -69,16 +84,27 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
             StockProvider.toggleShowPercent();
             updateContent();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     public void addSymbol() {
         if (NetworkUtil.isConnected(this)) {
-            // TODO: 23.12.16  check if connected and show dialog
-            Toast.makeText(this, "Add Symbol", Toast.LENGTH_SHORT).show();
+            // TODO: 23.12.16 show dialog and add symbol after checked
+            new MaterialDialog.Builder(this).title(R.string.symbol_search)
+                    .content(R.string.content_test)
+                    .inputType(InputType.TYPE_CLASS_TEXT)
+                    .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
+                        // TODO: 25.12.16 load from db
+                        String symbol = input.toString();
+                        if (StockProvider.loadStockFromDb(symbol) != null) {
+                            Toast.makeText(MainActivity.this, getString(R.string.stock_exists), Toast.LENGTH_LONG).show();
+                        } else {
+                            StockIntentService.addSymbol(this, symbol);
+                        }
+                    })
+                    .show();
         } else {
-            Toast.makeText(this, getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+            NetworkUtil.noNetworkToast(this);
         }
     }
 }

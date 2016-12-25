@@ -3,19 +3,19 @@ package de.lokaizyk.stockhawk.network.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by lars on 23.12.16.
+ * Created by lars on 25.12.16.
  */
 
-public class QueryResponse {
+public class SingleQueryResponse {
 
     @SerializedName("query")
-    private Query query;
+    private SingleQuery query;
 
-    public Query getQuery() {
+    public SingleQuery getQuery() {
         return query;
     }
 
-    public void setQuery(Query query) {
+    public void setQuery(SingleQuery query) {
         this.query = query;
     }
 

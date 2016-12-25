@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
+        <import type="android.view.View"/>
         <variable
             name="mainActivity"
             type="de.lokaizyk.stockhawk.ui.activities.MainActivity"/>
@@ -18,6 +19,13 @@
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_data"
+                android:visibility="@{mainActivity.mStockItems.size() > 0 ? View.GONE : View.VISIBLE}"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/stockList"

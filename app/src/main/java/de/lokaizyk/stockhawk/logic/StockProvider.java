@@ -39,4 +39,9 @@ public class StockProvider {
         return stocks;
     }
 
+    public static StockItemViewModel loadStockFromDb(String symbol) {
+        // TODO: 25.12.16
+        return null;
+    }
+
 }

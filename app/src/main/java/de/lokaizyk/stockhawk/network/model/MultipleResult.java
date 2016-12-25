@@ -8,7 +8,7 @@ import java.util.List;
  * Created by lars on 23.12.16.
  */
 
-public class Results {
+public class MultipleResult {
 
     @SerializedName("quote")
     private List<Quote> quotes = null;

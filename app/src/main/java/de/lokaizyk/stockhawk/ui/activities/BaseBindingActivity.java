@@ -45,13 +45,13 @@ public abstract class BaseBindingActivity<T extends ViewDataBinding> extends App
     @Override
     protected void onPause() {
         super.onPause();
-        DbManager.getInstance().registerForContentChange(this);
+        DbManager.getInstance().unregisterForContentChange(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        DbManager.getInstance().unregisterForContentChange(this);
+        DbManager.getInstance().registerForContentChange(this);
     }
 
     @Override

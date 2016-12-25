@@ -1,6 +1,7 @@
 package de.lokaizyk.stockhawk.network.api;
 
-import de.lokaizyk.stockhawk.network.model.QueryResponse;
+import de.lokaizyk.stockhawk.network.model.MultiQueryResponse;
+import de.lokaizyk.stockhawk.network.model.SingleQueryResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -25,7 +26,7 @@ public interface YahooApi {
 
     String VALUE_DIAGNOSTICS_TRUE = "true";
 
-    String VALUE_DIAGNOSTICS_FALSE = "true";
+    String VALUE_DIAGNOSTICS_FALSE = "false";
 
     String PARAM_ENV = "env";
 
@@ -46,7 +47,10 @@ public interface YahooApi {
     // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("AAPL","GOOG","MSFT","YHOO")&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys&callback=
 
     @GET(METHOD_YQL)
-    Call<QueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
+    Call<MultiQueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
+
+    @GET(METHOD_YQL)
+    Call<SingleQueryResponse> loadStock(@Query(value = PARAM_Q) String query);
 
     class SymbolBuilder {
 
