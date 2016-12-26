@@ -11,4 +11,5 @@
     <color name="material_red_a400">#FF5252</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="material_grey_500">#9E9E9E</color>
 </resources>

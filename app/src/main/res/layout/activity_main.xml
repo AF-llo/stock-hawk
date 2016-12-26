@@ -41,7 +41,8 @@
                 android:layout_margin="@dimen/activity_horizontal_margin"
                 app:fabSize="normal"
                 android:src="@drawable/ic_add_white_24dp"
-                android:onClick="@{() -> mainActivity.addSymbol()}"/>
+                android:onClick="@{() -> mainActivity.addSymbol()}"
+                android:contentDescription="@string/add_stock"/>
 
         </FrameLayout>
 
