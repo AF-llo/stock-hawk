@@ -41,7 +41,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingRight="@dimen/spacing_s"
+                android:paddingEnd="@dimen/spacing_s"
                 android:paddingLeft="@dimen/spacing_s"
+                android:paddingStart="@dimen/spacing_s"
                 android:text="@{stockItem.price}"
                 tools:text="1000.00"/>
 
@@ -51,7 +53,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/spacing_xs"
+                android:paddingStart="@dimen/spacing_xs"
                 android:paddingRight="@dimen/spacing_xs"
+                android:paddingEnd="@dimen/spacing_xs"
                 android:text="@{StockProvider.showPercent ? stockItem.percentChange : stockItem.change}"
                 app:backgroundDrawable="@{stockItem.isUp ? R.drawable.percent_change_pill_green : R.drawable.percent_change_pill_red}"
                 tools:text="100%"

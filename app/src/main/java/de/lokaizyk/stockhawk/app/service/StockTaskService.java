@@ -114,6 +114,11 @@ public class StockTaskService extends GcmTaskService {
         long time;
         if (symbolCount > 1) {
             Response<MultiQueryResponse> response = mYahooApi.loadStocks(query).execute();
+            for (Quote quote : response.body().getQuery().getResults().getQuotes()) {
+                if (isValidStock(quote)) {
+                    quotes.add(quote);
+                }
+            }
             quotes.addAll(response.body().getQuery().getResults().getQuotes());
             time = response.body().getQuery().getCreated().getTime();
         } else {
