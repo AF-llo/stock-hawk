@@ -1,10 +1,13 @@
 package de.lokaizyk.stockhawk.logic.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by lars on 23.12.16.
  */
 
-public class StockItemViewModel {
+public class StockItemViewModel implements Parcelable {
 
     private boolean isUp = false;
 
@@ -55,4 +58,41 @@ public class StockItemViewModel {
     public void setPercentChange(String percentChange) {
         this.percentChange = percentChange;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte(this.isUp ? (byte) 1 : (byte) 0);
+        dest.writeString(this.symbol);
+        dest.writeString(this.price);
+        dest.writeString(this.change);
+        dest.writeString(this.percentChange);
+    }
+
+    public StockItemViewModel() {
+    }
+
+    protected StockItemViewModel(Parcel in) {
+        this.isUp = in.readByte() != 0;
+        this.symbol = in.readString();
+        this.price = in.readString();
+        this.change = in.readString();
+        this.percentChange = in.readString();
+    }
+
+    public static final Parcelable.Creator<StockItemViewModel> CREATOR = new Parcelable.Creator<StockItemViewModel>() {
+        @Override
+        public StockItemViewModel createFromParcel(Parcel source) {
+            return new StockItemViewModel(source);
+        }
+
+        @Override
+        public StockItemViewModel[] newArray(int size) {
+            return new StockItemViewModel[size];
+        }
+    };
 }

@@ -23,6 +23,9 @@ public abstract class BaseBindingActivity<T extends ViewDataBinding> extends App
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, getLayoutRessourceId());
         onBindingInitialized();
+        if (savedInstanceState == null) {
+            updateContent();
+        }
     }
 
     /**

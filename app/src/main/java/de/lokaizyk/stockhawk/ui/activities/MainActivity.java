@@ -1,7 +1,6 @@
 package de.lokaizyk.stockhawk.ui.activities;
 
 import android.databinding.ObservableArrayList;
-import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.InputType;
@@ -25,12 +24,14 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    public ObservableList<StockItemViewModel> mStockItems = new ObservableArrayList<>();
+    public static final String EXTRAS_STOCKS = "extraStocks";
 
+    public ObservableArrayList<StockItemViewModel> mStockItems = new ObservableArrayList<>();
+
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        updateContent();
 
         boolean isConnected = NetworkUtil.isConnected(this);
         if (savedInstanceState == null){
@@ -40,10 +41,17 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
             } else{
                 NetworkUtil.noNetworkToast(this);
             }
+        } else {
+            mStockItems = (ObservableArrayList) savedInstanceState.getParcelableArrayList(EXTRAS_STOCKS);
         }
         if (isConnected) {
             StockTaskService.runPeriodic(this);
         }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     @Override
@@ -65,8 +73,14 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(EXTRAS_STOCKS, mStockItems);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onItemClicked(StockItemViewModel item, int position) {
-        Toast.makeText(this, "Clicked " + item.getSymbol(), Toast.LENGTH_SHORT).show();
+        StockDetailsActivity.start(this, item.getSymbol());
     }
 
     @Override
