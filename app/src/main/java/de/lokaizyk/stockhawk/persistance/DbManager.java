@@ -1,11 +1,18 @@
 package de.lokaizyk.stockhawk.persistance;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Observer;
+
+import de.lokaizyk.stockhawk.persistance.model.DaoMaster;
+import de.lokaizyk.stockhawk.persistance.model.DaoSession;
+import de.lokaizyk.stockhawk.persistance.model.DbStock;
+import de.lokaizyk.stockhawk.persistance.model.DbStockDao;
 
 /**
  * Created by lars on 22.10.16.
@@ -25,6 +32,8 @@ public class DbManager {
 
     private static DbManager mInstance;
 
+    private DaoSession daoSession;
+
     // TODO: 22.10.16 umcomment when classes are created by GreenDAO
 
 //    private DaoSession daoSession;
@@ -34,9 +43,9 @@ public class DbManager {
     private DbManager(Context context) {
         mContext = new WeakReference<>(context);
         contentObservable = new DbContentObservable();
-//        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(mContext.get(), DB_NAME);
-//        SQLiteDatabase database = helper.getWritableDatabase();
-//        daoSession = new DaoMaster(database).newSession();
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(mContext.get(), DB_NAME);
+        SQLiteDatabase database = helper.getWritableDatabase();
+        daoSession = new DaoMaster(database).newSession();
     }
 
     /**
@@ -81,6 +90,49 @@ public class DbManager {
                 contentObservable.notifyObservers();
             }
         });
+    }
+
+    public List<DbStock> loadAll() {
+        return daoSession.getDbStockDao().loadAll();
+    }
+
+    public List<DbStock> loadAllCurrentStocks() {
+        return daoSession.getDbStockDao()
+                .queryBuilder()
+                .where(DbStockDao.Properties.IsCurrent.eq(true))
+                .build()
+                .list();
+    }
+
+    public DbStock loadCurrentStock(String symbol) {
+        return daoSession.getDbStockDao()
+                .queryBuilder()
+                .where(DbStockDao.Properties.Symbol.eq(symbol), DbStockDao.Properties.IsCurrent.eq(true))
+                .build()
+                .unique();
+    }
+
+    public List<DbStock> loadStocks(String symbol) {
+        return daoSession.getDbStockDao()
+                .queryBuilder()
+                .where(DbStockDao.Properties.Symbol.eq(symbol))
+                .build()
+                .list();
+    }
+
+    public void insertOrReplace(List<DbStock> stocks) {
+        DbStockDao stockDao = daoSession.getDbStockDao();
+        for (DbStock stock : stocks) {
+            if (stock != null) {
+                DbStock currentStock = loadCurrentStock(stock.getSymbol());
+                if (currentStock != null) {
+                    currentStock.setIsCurrent(false);
+                    stockDao.insertOrReplace(currentStock);
+                }
+                stock.setIsCurrent(true);
+                stockDao.insertOrReplace(stock);
+            }
+        }
     }
 
     private static class DbManagerNotInitializedException extends RuntimeException {

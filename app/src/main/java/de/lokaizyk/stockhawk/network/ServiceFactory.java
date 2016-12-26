@@ -1,6 +1,7 @@
 package de.lokaizyk.stockhawk.network;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.gson.GsonBuilder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +47,10 @@ public class ServiceFactory<T> {
         return new Retrofit.Builder()
                 .client(mClient)
                 .baseUrl(mBaseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(
+                        new GsonBuilder().setDateFormat(YahooApi.DATE_PATTERN)
+                        .create()
+                ))
                 .build();
     }
 

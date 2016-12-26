@@ -44,6 +44,8 @@ public interface YahooApi {
 
     String INITIAL_SYMBOL_YHOO = "YHOO";
 
+    String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+
     // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("AAPL","GOOG","MSFT","YHOO")&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys&callback=
 
     @GET(METHOD_YQL)
@@ -53,6 +55,8 @@ public interface YahooApi {
     Call<SingleQueryResponse> loadStock(@Query(value = PARAM_Q) String query);
 
     class SymbolBuilder {
+
+        private int count = 0;
 
         private boolean hasSymbols = false;
 
@@ -76,7 +80,12 @@ public interface YahooApi {
                     .append(symbol)
                     .append("\"")
                     .append(",");
+            count++;
             return this;
+        }
+
+        public int getSymbolCount() {
+            return count;
         }
 
         public String buildSymbolQueryValue() {

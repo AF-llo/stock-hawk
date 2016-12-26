@@ -2,6 +2,8 @@ package de.lokaizyk.stockhawk.network.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 /**
  * Created by lars on 23.12.16.
  */
@@ -12,7 +14,7 @@ public class MultipleQuery {
     private Integer count;
 
     @SerializedName("created")
-    private String created;
+    private Date created;
 
     @SerializedName("lang")
     private String lang;
@@ -28,11 +30,11 @@ public class MultipleQuery {
         this.count = count;
     }
 
-    public String getCreated() {
+    public Date getCreated() {
         return created;
     }
 
-    public void setCreated(String created) {
+    public void setCreated(Date created) {
         this.created = created;
     }
 

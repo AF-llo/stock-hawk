@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.support.annotation.StringDef;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -21,12 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lokaizyk.stockhawk.R;
+import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.network.api.YahooApi;
 import de.lokaizyk.stockhawk.network.api.YahooApiFactory;
 import de.lokaizyk.stockhawk.network.model.MultiQueryResponse;
 import de.lokaizyk.stockhawk.network.model.Quote;
 import de.lokaizyk.stockhawk.network.model.SingleQueryResponse;
 import de.lokaizyk.stockhawk.persistance.DbManager;
+import de.lokaizyk.stockhawk.persistance.model.DbStock;
 import retrofit2.Response;
 
 /**
@@ -53,8 +56,6 @@ public class StockTaskService extends GcmTaskService {
 
     private YahooApi mYahooApi;
 
-    private boolean isUpdate = false;
-
     private Context mContext;
 
     public StockTaskService(Context context) {
@@ -74,30 +75,28 @@ public class StockTaskService extends GcmTaskService {
         }
         YahooApi.SymbolBuilder symbolBuilder = new YahooApi.SymbolBuilder();
         if (taskParams.getTag().equals(INIT) || taskParams.getTag().equals(PERIODIC)) {
-            isUpdate = true;
-            // load data from DB ->
-            // if empty -> load with default
-            // TODO: 25.12.16
-            if (true) {
+            List<DbStock> dbStocks = DbManager.getInstance().loadAllCurrentStocks();
+            if (dbStocks.size() == 0) {
                 symbolBuilder.addInitialSymbols();
             } else {
-                // else -> load existing symbols and update
+                for (DbStock dbStock : dbStocks) {
+                    symbolBuilder.addSymbol(dbStock.getSymbol());
+                }
             }
-
         } else if (taskParams.getTag().equals(ADD)) {
-            isUpdate = false;
             String stockInput = taskParams.getExtras().getString(EXTRA_SYMBOL);
             symbolBuilder.addSymbol(stockInput);
         }
         int result = GcmNetworkManager.RESULT_FAILURE;
         try {
-            List<Quote> loadedQuotes = fetchData(isUpdate, symbolBuilder.buildSymbolQueryValue());
+            Pair<Long, List<Quote>> loadedQuotes = fetchData(symbolBuilder.getSymbolCount(), symbolBuilder.buildSymbolQueryValue());
             result = GcmNetworkManager.RESULT_SUCCESS;
-            if (loadedQuotes.size() > 0) {
-                if (isUpdate) {
-                    // todo set current to false
+            if (loadedQuotes.second.size() > 0) {
+                List<DbStock> stocks = new ArrayList<>();
+                for (Quote quote : loadedQuotes.second) {
+                    stocks.add(StockProvider.dbStockFromQuote(quote, loadedQuotes.first));
                 }
-                // TODO: 25.12.16 write to db
+                DbManager.getInstance().insertOrReplace(stocks);
                 DbManager.getInstance().notifyObserver();
             } else {
                 if (mContext != null) {
@@ -110,19 +109,22 @@ public class StockTaskService extends GcmTaskService {
         return result;
     }
 
-    private List<Quote> fetchData(boolean isUpdate, String query) throws IOException {
+    private Pair<Long, List<Quote>> fetchData(int symbolCount, String query) throws IOException {
         List<Quote> quotes = new ArrayList<>();
-        if (isUpdate) {
+        long time;
+        if (symbolCount > 1) {
             Response<MultiQueryResponse> response = mYahooApi.loadStocks(query).execute();
             quotes.addAll(response.body().getQuery().getResults().getQuotes());
+            time = response.body().getQuery().getCreated().getTime();
         } else {
             Response<SingleQueryResponse> response = mYahooApi.loadStock(query).execute();
             Quote quote = response.body().getQuery().getResults().getQuote();
             if (isValidStock(quote)) {
                 quotes.add(quote);
             }
+            time = response.body().getQuery().getCreated().getTime();
         }
-        return quotes;
+        return new Pair<>(time, quotes);
     }
 
     private void toastOnMainThread(String message) {

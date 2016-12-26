@@ -30,6 +30,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        updateContent();
 
         boolean isConnected = NetworkUtil.isConnected(this);
         if (savedInstanceState == null){
@@ -60,7 +61,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     @Override
     protected void updateContent() {
         mStockItems.clear();
-        mStockItems.addAll(StockProvider.loadStocksFromDb());
+        mStockItems.addAll(StockProvider.loadCurrentStocksFromDb());
     }
 
     @Override
