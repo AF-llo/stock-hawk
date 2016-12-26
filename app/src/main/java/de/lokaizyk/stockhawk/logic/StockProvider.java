@@ -40,8 +40,7 @@ public class StockProvider {
     }
 
     public static StockItemViewModel loadStockFromDb(String symbol) {
-        // TODO: 25.12.16
-        return null;
+        return stockItemFromDbStock(DbManager.getInstance().loadCurrentStock(symbol));
     }
 
     @Nullable

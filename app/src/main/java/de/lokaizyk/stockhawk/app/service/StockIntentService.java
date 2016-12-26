@@ -17,7 +17,7 @@ public class StockIntentService extends IntentService {
     private static final String EXTRAS_TAG = "tag";
 
     public StockIntentService(){
-        super(StockIntentService.class.getName());
+        this(StockIntentService.class.getName());
     }
 
     public StockIntentService(String name) {

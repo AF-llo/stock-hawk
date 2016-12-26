@@ -3,6 +3,7 @@ package de.lokaizyk.stockhawk.persistance;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -34,9 +35,7 @@ public class DbManager {
 
     private DaoSession daoSession;
 
-    // TODO: 22.10.16 umcomment when classes are created by GreenDAO
-
-//    private DaoSession daoSession;
+    private Handler mHandler;
 
     private DbContentObservable contentObservable;
 
@@ -46,6 +45,7 @@ public class DbManager {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(mContext.get(), DB_NAME);
         SQLiteDatabase database = helper.getWritableDatabase();
         daoSession = new DaoMaster(database).newSession();
+        mHandler = new Handler(Looper.getMainLooper());
     }
 
     /**
@@ -84,7 +84,7 @@ public class DbManager {
 
     public void notifyObserver() {
         Log.d(TAG, "notifyObserver");
-        new Handler().post(() -> {
+        mHandler.post(() -> {
             if (contentObservable != null) {
                 contentObservable.setChangedNow();
                 contentObservable.notifyObservers();
@@ -132,6 +132,14 @@ public class DbManager {
                 stock.setIsCurrent(true);
                 stockDao.insertOrReplace(stock);
             }
+        }
+    }
+
+    public void removeSymbol(String symbol) {
+        DbStockDao stockDao = daoSession.getDbStockDao();
+        List<DbStock> stocks = loadStocks(symbol);
+        for (DbStock stock : stocks) {
+            stockDao.delete(stock);
         }
     }
 

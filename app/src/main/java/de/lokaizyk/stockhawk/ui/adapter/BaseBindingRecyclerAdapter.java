@@ -11,7 +11,7 @@ import de.lokaizyk.stockhawk.ui.viewholder.ViewHolder;
  * Created by lars on 03.10.16.
  */
 
-public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter<ViewHolder> {
+public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements ItemDismissAdapter {
 
     private ObservableList<T> mItems = new ObservableArrayList<>();
 
@@ -27,6 +27,18 @@ public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter
     public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
     }
+
+    @Override
+    public void onItemDismiss(int position) {
+        T item = mItems.get(position);
+        if (item != null) {
+            mItems.remove(position);
+            notifyItemRemoved(position);
+            onItemDeleted(item);
+        }
+    }
+
+    protected abstract void onItemDeleted(T item);
 
     @SuppressWarnings("unchecked")
     @Override

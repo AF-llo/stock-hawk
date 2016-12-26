@@ -3,6 +3,7 @@ package de.lokaizyk.stockhawk.util;
 import android.databinding.BindingAdapter;
 import android.databinding.ObservableList;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 
 import de.lokaizyk.stockhawk.ui.adapter.BaseBindingRecyclerAdapter;
 
@@ -19,6 +20,8 @@ public class RecyclerViewBindings {
         if (!(adapter instanceof BaseBindingRecyclerAdapter)) {
             throw new IllegalArgumentException(adapter.getClass().getSimpleName() + " must extend " + BaseBindingRecyclerAdapter.class.getSimpleName());
         }
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback((BaseBindingRecyclerAdapter)adapter));
+        touchHelper.attachToRecyclerView(recyclerView);
         ((BaseBindingRecyclerAdapter)adapter).setItems(itms);
     }
 

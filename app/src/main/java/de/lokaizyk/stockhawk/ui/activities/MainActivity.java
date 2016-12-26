@@ -90,7 +90,6 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
 
     public void addSymbol() {
         if (NetworkUtil.isConnected(this)) {
-            // TODO: 23.12.16 show dialog and add symbol after checked
             new MaterialDialog.Builder(this).title(R.string.symbol_search)
                     .content(R.string.content_test)
                     .inputType(InputType.TYPE_CLASS_TEXT)

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
+import de.lokaizyk.stockhawk.persistance.DbManager;
 import de.lokaizyk.stockhawk.ui.viewholder.StockItemViewHolder;
 import de.lokaizyk.stockhawk.ui.viewholder.ViewHolder;
 
@@ -15,5 +16,10 @@ public class StockAdapter extends BaseBindingRecyclerAdapter<StockItemViewModel>
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new StockItemViewHolder(LayoutInflater.from(parent.getContext()), parent);
+    }
+
+    @Override
+    protected void onItemDeleted(StockItemViewModel item) {
+        DbManager.getInstance().removeSymbol(item.getSymbol());
     }
 }
