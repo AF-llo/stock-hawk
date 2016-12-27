@@ -18,7 +18,7 @@ import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
 import de.lokaizyk.stockhawk.ui.adapter.BaseBindingRecyclerAdapter;
 import de.lokaizyk.stockhawk.ui.adapter.StockAdapter;
-import de.lokaizyk.stockhawk.util.NetworkUtil;
+import de.lokaizyk.stockhawk.util.DeviceUtil;
 
 public class MainActivity extends BaseBindingActivity<ActivityMainBinding> implements BaseBindingRecyclerAdapter.OnItemClickListener<StockItemViewModel> {
 
@@ -33,14 +33,14 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        boolean isConnected = NetworkUtil.isConnected(this);
+        boolean isConnected = DeviceUtil.isConnected(this);
         if (savedInstanceState == null){
             updateContent();
             // Run the initialize task service so that some stocks appear upon an empty database
             if (isConnected){
                 StockIntentService.initialize(this);
             } else{
-                NetworkUtil.noNetworkToast(this);
+                DeviceUtil.noNetworkToast(this);
             }
         } else {
             mStockItems = (ObservableArrayList) savedInstanceState.getParcelableArrayList(EXTRAS_STOCKS);
@@ -104,7 +104,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     }
 
     public void addSymbol() {
-        if (NetworkUtil.isConnected(this)) {
+        if (DeviceUtil.isConnected(this)) {
             new MaterialDialog.Builder(this).title(R.string.symbol_search)
                     .content(R.string.content_test)
                     .inputType(InputType.TYPE_CLASS_TEXT)
@@ -118,7 +118,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
                     })
                     .show();
         } else {
-            NetworkUtil.noNetworkToast(this);
+            DeviceUtil.noNetworkToast(this);
         }
     }
 }

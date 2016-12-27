@@ -6,14 +6,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import org.greenrobot.greendao.query.QueryBuilder;
+
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observer;
 
 import de.lokaizyk.stockhawk.persistance.model.DaoMaster;
 import de.lokaizyk.stockhawk.persistance.model.DaoSession;
 import de.lokaizyk.stockhawk.persistance.model.DbStock;
 import de.lokaizyk.stockhawk.persistance.model.DbStockDao;
+import de.lokaizyk.stockhawk.util.DeviceUtil;
 
 /**
  * Created by lars on 22.10.16.
@@ -114,10 +118,13 @@ public class DbManager {
     }
 
     public List<DbStock> loadStocks(String symbol) {
-        return daoSession.getDbStockDao()
+        QueryBuilder<DbStock> queryBuilder = daoSession.getDbStockDao()
                 .queryBuilder()
-                .where(DbStockDao.Properties.Symbol.eq(symbol))
-                .build()
+                .where(DbStockDao.Properties.Symbol.eq(symbol));
+        if (DeviceUtil.isRTL(Locale.getDefault())) {
+            queryBuilder.orderDesc(DbStockDao.Properties.Id);
+        }
+        return queryBuilder.build()
                 .list();
     }
 

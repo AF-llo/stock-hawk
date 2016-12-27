@@ -5,13 +5,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 import de.lokaizyk.stockhawk.R;
 
 /**
  * Created by lars on 23.12.16.
  */
 
-public class NetworkUtil {
+public class DeviceUtil {
 
     public static boolean isConnected(Context context) {
         if (context == null) {
@@ -25,6 +27,12 @@ public class NetworkUtil {
 
     public static void noNetworkToast(Context context) {
         Toast.makeText(context, context.getString(R.string.no_network), Toast.LENGTH_SHORT).show();
+    }
+
+    public static boolean isRTL(Locale locale) {
+        final int directionality = Character.getDirectionality(locale.getDisplayName().charAt(0));
+        return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
+                directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
 }
