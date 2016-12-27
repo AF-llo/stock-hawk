@@ -100,6 +100,7 @@ public class DbManager {
         return daoSession.getDbStockDao()
                 .queryBuilder()
                 .where(DbStockDao.Properties.IsCurrent.eq(true))
+                .orderAsc(DbStockDao.Properties.Symbol)
                 .build()
                 .list();
     }

@@ -47,6 +47,7 @@ public interface YahooApi {
     String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
 
     // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("AAPL","GOOG","MSFT","YHOO")&format=json&diagnostics=true&env=store://datatables.org/alltableswithkeys&callback=
+    // https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.quotes where symbol in ("YHOO","GOOG","MSFT","AAPL")&format=json&diagnostics=false&env=store://datatables.org/alltableswithkeys&callback=
 
     @GET(METHOD_YQL)
     Call<MultiQueryResponse> loadStocks(@Query(value = PARAM_Q) String query);
