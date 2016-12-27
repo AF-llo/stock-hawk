@@ -3,7 +3,9 @@ package de.lokaizyk.stockhawk.ui.viewholder;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import de.lokaizyk.stockhawk.BR;
+import de.lokaizyk.stockhawk
+
+        .BR;
 import de.lokaizyk.stockhawk.R;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
 

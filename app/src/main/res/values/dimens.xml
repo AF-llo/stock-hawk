@@ -7,4 +7,5 @@
     <dimen name="spacing_xs">3dp</dimen>
     <dimen name="spacing_s">10dp</dimen>
     <dimen name="list_item_hight">72dp</dimen>
+    <dimen name="line_chart_height">300dp</dimen>
 </resources>

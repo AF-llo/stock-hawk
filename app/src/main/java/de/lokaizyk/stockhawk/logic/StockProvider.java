@@ -2,6 +2,8 @@ package de.lokaizyk.stockhawk.logic;
 
 import android.support.annotation.Nullable;
 
+import com.github.mikephil.charting.data.Entry;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +43,19 @@ public class StockProvider {
 
     public static StockItemViewModel loadStockFromDb(String symbol) {
         return stockItemFromDbStock(DbManager.getInstance().loadCurrentStock(symbol));
+    }
+
+    public static List<Entry> loadStockEntriesFromDb(String symbol) {
+        List<DbStock> stocks = DbManager.getInstance().loadStocks(symbol);
+        List<Entry> entries = new ArrayList<>();
+        int index = 0;
+        for (DbStock stock : stocks) {
+            if (stock != null) {
+                entries.add(new Entry((float) index, Float.valueOf(stock.getBidprice())));
+                index++;
+            }
+        }
+        return entries;
     }
 
     @Nullable

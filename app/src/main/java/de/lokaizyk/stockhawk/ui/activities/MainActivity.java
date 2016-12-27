@@ -35,6 +35,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
 
         boolean isConnected = NetworkUtil.isConnected(this);
         if (savedInstanceState == null){
+            updateContent();
             // Run the initialize task service so that some stocks appear upon an empty database
             if (isConnected){
                 StockIntentService.initialize(this);
@@ -108,7 +109,6 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
                     .content(R.string.content_test)
                     .inputType(InputType.TYPE_CLASS_TEXT)
                     .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
-                        // TODO: 25.12.16 load from db
                         String symbol = input.toString();
                         if (StockProvider.loadStockFromDb(symbol) != null) {
                             Toast.makeText(MainActivity.this, getString(R.string.stock_exists), Toast.LENGTH_LONG).show();
