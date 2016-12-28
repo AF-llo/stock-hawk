@@ -67,6 +67,7 @@ public class StockDetailsViewsFactory implements RemoteViewsService.RemoteViewsF
         views.setTextViewText(R.id.change, item.getChange());
         views.setInt(R.id.change, "setBackgroundResource", item.isUp() ? R.color.material_green_700 : R.color.material_red_700);
 
+        // TODO: 28.12.16 handle when started on tablet
         views.setOnClickFillInIntent(R.id.stock_list_item, StockDetailsActivity.getIntent(item.getSymbol()));
         return views;
     }

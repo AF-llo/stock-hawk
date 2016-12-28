@@ -55,6 +55,7 @@ public class CustomLineChart extends LineChart {
         dataSet.setColor(color);
         data.addDataSet(dataSet);
         setData(data);
+        invalidate();
     }
 
     public void setLabel(int labelId) {
