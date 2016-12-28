@@ -4,4 +4,5 @@
     android:initialLayout="@layout/layout_stock_widget"
     android:minHeight="@dimen/widget_height"
     android:minWidth="@dimen/widget_width"
+    android:previewImage="@drawable/widgte_preview_image"
     android:updatePeriodMillis="0"/>
