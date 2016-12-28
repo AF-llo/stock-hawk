@@ -6,6 +6,7 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
@@ -30,6 +31,7 @@ import de.lokaizyk.stockhawk.network.model.Quote;
 import de.lokaizyk.stockhawk.network.model.SingleQueryResponse;
 import de.lokaizyk.stockhawk.persistance.DbManager;
 import de.lokaizyk.stockhawk.persistance.model.DbStock;
+import de.lokaizyk.stockhawk.ui.widget.StockDetailsWidgetProvider;
 import retrofit2.Response;
 
 /**
@@ -140,6 +142,7 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 DbManager.getInstance().insertOrReplace(stocks);
                 DbManager.getInstance().notifyObserver();
+                updateWidgets(getContext());
             } else {
                 if (getContext() != null) {
                     toastOnMainThread(getContext().getString(R.string.stock_not_found));
@@ -148,7 +151,12 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             Log.e(TAG, "Error loading data from Backend", e);
         }
-        // TODO: 28.12.16 send broadcast that to update widget
+    }
+
+    public static void updateWidgets(Context context) {
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(StockDetailsWidgetProvider.ACTION_UPDATE).setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     private Pair<Long, List<Quote>> fetchData(int symbolCount, String query) throws IOException {

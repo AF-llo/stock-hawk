@@ -13,6 +13,7 @@
     </data>
 
     <FrameLayout
+        android:id="@+id/stock_list_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foreground="@drawable/stock_item_background"

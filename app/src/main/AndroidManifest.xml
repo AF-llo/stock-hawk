@@ -51,6 +51,8 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
+        <service android:name=".ui.widget.StockDetailsWidgetRemoteViewService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <provider
             android:authorities="@string/content_authority"
             android:name=".app.sync.StockStubProvider"
@@ -58,10 +60,11 @@
             android:syncable="true" />
 
         <receiver
-            android:name=".ui.widget.StockWidgetProvider"
+            android:name=".ui.widget.StockDetailsWidgetProvider"
             android:label="@string/titel_widget_stock">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="de.lokaizyk.stockhawk.app.ACTION_DATA_UPDATED"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

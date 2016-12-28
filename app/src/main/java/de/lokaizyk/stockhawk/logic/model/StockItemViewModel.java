@@ -9,6 +9,8 @@ import android.os.Parcelable;
 
 public class StockItemViewModel implements Parcelable {
 
+    private long id = -1;
+
     private boolean isUp = false;
 
     private String symbol = "";
@@ -18,6 +20,14 @@ public class StockItemViewModel implements Parcelable {
     private String change = "";
 
     private String percentChange = "";
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public boolean isUp() {
         return isUp;
@@ -66,6 +76,7 @@ public class StockItemViewModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
         dest.writeByte(this.isUp ? (byte) 1 : (byte) 0);
         dest.writeString(this.symbol);
         dest.writeString(this.price);
@@ -77,6 +88,7 @@ public class StockItemViewModel implements Parcelable {
     }
 
     protected StockItemViewModel(Parcel in) {
+        this.id = in.readLong();
         this.isUp = in.readByte() != 0;
         this.symbol = in.readString();
         this.price = in.readString();

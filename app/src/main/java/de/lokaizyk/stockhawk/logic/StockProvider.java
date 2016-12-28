@@ -64,6 +64,7 @@ public class StockProvider {
             return null;
         }
         StockItemViewModel stockItem = new StockItemViewModel();
+        stockItem.setId(dbStock.getId());
         stockItem.setSymbol(dbStock.getSymbol());
         stockItem.setChange(dbStock.getChange());
         stockItem.setPercentChange(dbStock.getPercentChange());

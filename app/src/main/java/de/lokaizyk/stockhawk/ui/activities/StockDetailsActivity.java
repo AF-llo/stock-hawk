@@ -38,6 +38,12 @@ public class StockDetailsActivity extends BaseBindingActivity<ActivityStockDetai
         }
     }
 
+    public static Intent getIntent(String symbol) {
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_SYMBOL, symbol);
+        return intent;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

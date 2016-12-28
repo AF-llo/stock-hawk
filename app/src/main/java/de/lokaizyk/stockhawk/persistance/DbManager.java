@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Observer;
 
+import de.lokaizyk.stockhawk.app.sync.StockHawkSyncAdapter;
 import de.lokaizyk.stockhawk.persistance.model.DaoMaster;
 import de.lokaizyk.stockhawk.persistance.model.DaoSession;
 import de.lokaizyk.stockhawk.persistance.model.DbStock;
@@ -71,9 +72,13 @@ public class DbManager {
     }
 
     private static void checkInitialization() {
-        if (mContext == null) {
+        if (!isInitialized()) {
             throw new DbManagerNotInitializedException();
         }
+    }
+
+    public static boolean isInitialized() {
+        return mContext != null;
     }
 
     // methods
@@ -148,6 +153,9 @@ public class DbManager {
         List<DbStock> stocks = loadStocks(symbol);
         for (DbStock stock : stocks) {
             stockDao.delete(stock);
+        }
+        if (mContext != null && mContext.get() != null) {
+            StockHawkSyncAdapter.updateWidgets(mContext.get());
         }
     }
 
