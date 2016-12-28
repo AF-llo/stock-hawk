@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Observable;
 import java.util.Observer;
 
 import de.lokaizyk.stockhawk.persistance.DbManager;
@@ -45,6 +46,13 @@ public abstract class BaseBindingFragment<T extends ViewDataBinding> extends Fra
     public T getBinding() {
         return mBinding;
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        updateContent();
+    }
+
+    public abstract void updateContent();
 
     @Override
     public void onResume() {

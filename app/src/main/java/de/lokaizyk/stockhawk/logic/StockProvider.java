@@ -37,6 +37,8 @@ public class StockProvider {
 
     private static final String DEFAULT_CHANGE_INPERCENT = DEFAULT_CHANGE + "%";
 
+    private static final String FLOAT_FORMAT_PATTERN = "%.2f";
+
     public static final String HISTORICAL_QUOTE_DATE_PATTERN = "yyyy-MM-dd";
 
     public static List<StockItemViewModel> loadCurrentStocksFromDb() {
@@ -92,7 +94,7 @@ public class StockProvider {
         dbStock.setSymbol(quote.getSymbol());
         dbStock.setChange(truncateChange(quote.getChange(), false));
         dbStock.setPercentChange(truncateChange(quote.getChangeinPercent(), true));
-        dbStock.setBidprice(String.format(Locale.US, "%.2f", Float.parseFloat(quote.getBid())));
+        dbStock.setBidprice(String.format(Locale.US, FLOAT_FORMAT_PATTERN, Float.parseFloat(quote.getBid())));
         dbStock.setCreated(time);
         dbStock.setIsUp(quote.getChange().charAt(0) != '-');
         dbStock.setIsCurrent(true);
@@ -108,7 +110,7 @@ public class StockProvider {
         dbStock.setSymbol(historicalQuote.getSymbol());
         dbStock.setChange(DEFAULT_CHANGE);
         dbStock.setPercentChange(DEFAULT_CHANGE_INPERCENT);
-        dbStock.setBidprice(String.format(Locale.US, "%.2f", Float.parseFloat(historicalQuote.getClose())));
+        dbStock.setBidprice(String.format(Locale.US, FLOAT_FORMAT_PATTERN, Float.parseFloat(historicalQuote.getClose())));
         dbStock.setCreated(DateTime.parse(historicalQuote.getDate(), DateTimeFormat.forPattern(HISTORICAL_QUOTE_DATE_PATTERN)).getMillis());
         dbStock.setIsUp(true);
         dbStock.setIsCurrent(false);
@@ -124,7 +126,7 @@ public class StockProvider {
         }
         change = change.substring(1, change.length());
         double round = (double) Math.round(Double.parseDouble(change) * 100) / 100;
-        change = String.format(Locale.US, "%.2f", round);
+        change = String.format(Locale.US, FLOAT_FORMAT_PATTERN, round);
         StringBuffer changeBuffer = new StringBuffer(change);
         changeBuffer.insert(0, weight);
         changeBuffer.append(ampersand);

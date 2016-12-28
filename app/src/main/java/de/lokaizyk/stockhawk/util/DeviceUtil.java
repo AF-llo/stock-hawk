@@ -35,4 +35,18 @@ public class DeviceUtil {
                 directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
+    public static boolean isTablet(Context context) {
+        if (context == null) {
+            return false;
+        }
+        return context.getResources().getBoolean(R.bool.is_tablet);
+    }
+
+    public static boolean isLandscape(Context context) {
+        if (context == null) {
+            return false;
+        }
+        return context.getResources().getBoolean(R.bool.is_landscape);
+    }
+
 }

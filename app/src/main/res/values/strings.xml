@@ -16,4 +16,5 @@
 
     <string name="content_authority">de.lokaizyk.stockhawk.app</string>
     <string name="sync_account_type">stockhawk.lokaizyk.de</string>
+    <string name="action_add">Add stock</string>
 </resources>

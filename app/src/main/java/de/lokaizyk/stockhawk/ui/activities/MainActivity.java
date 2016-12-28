@@ -1,8 +1,6 @@
 package de.lokaizyk.stockhawk.ui.activities;
 
-import android.databinding.ObservableArrayList;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,40 +13,13 @@ import de.lokaizyk.stockhawk.app.sync.StockHawkSyncAdapter;
 import de.lokaizyk.stockhawk.databinding.ActivityMainBinding;
 import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
-import de.lokaizyk.stockhawk.ui.adapter.BaseBindingRecyclerAdapter;
-import de.lokaizyk.stockhawk.ui.adapter.StockAdapter;
+import de.lokaizyk.stockhawk.ui.fragments.StockDetailsFragment;
+import de.lokaizyk.stockhawk.ui.fragments.StocksFragment;
 import de.lokaizyk.stockhawk.util.DeviceUtil;
 
-public class MainActivity extends BaseBindingActivity<ActivityMainBinding> implements BaseBindingRecyclerAdapter.OnItemClickListener<StockItemViewModel> {
+public class MainActivity extends BaseBindingActivity<ActivityMainBinding> implements StocksFragment.Callback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    public static final String EXTRAS_STOCKS = "extraStocks";
-
-    public ObservableArrayList<StockItemViewModel> mStockItems = new ObservableArrayList<>();
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        boolean isConnected = DeviceUtil.isConnected(this);
-        if (savedInstanceState == null){
-            updateContent();
-            // Run the initialize task service so that some stocks appear upon an empty database
-            if (!isConnected){
-                DeviceUtil.noNetworkToast(this);
-            }
-        } else {
-            mStockItems = (ObservableArrayList) savedInstanceState.getParcelableArrayList(EXTRAS_STOCKS);
-        }
-        StockHawkSyncAdapter.initializeSyncAdapter(this);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
 
     @Override
     protected int getLayoutRessourceId() {
@@ -57,26 +28,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
 
     @Override
     protected void onBindingInitialized() {
-        getBinding().setMainActivity(this);
-        getBinding().stockList.setLayoutManager(new LinearLayoutManager(this));
-        getBinding().stockList.setAdapter(new StockAdapter());
-    }
 
-    @Override
-    protected void updateContent() {
-        mStockItems.clear();
-        mStockItems.addAll(StockProvider.loadCurrentStocksFromDb());
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(EXTRAS_STOCKS, mStockItems);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onItemClicked(StockItemViewModel item, int position) {
-        StockDetailsActivity.start(this, item.getSymbol());
     }
 
     @Override
@@ -88,12 +40,14 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add) {
+            addSymbol();
             return true;
         }
         if (id == R.id.action_change_units){
             StockProvider.toggleShowPercent();
-            updateContent();
+            StocksFragment fragment = (StocksFragment) getSupportFragmentManager().findFragmentById(R.id.stocks_fragment);
+            fragment.updateContent();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -114,6 +68,18 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
                     .show();
         } else {
             DeviceUtil.noNetworkToast(this);
+        }
+    }
+
+    @Override
+    public void onStockSelected(StockItemViewModel stockItem) {
+        if (DeviceUtil.isTablet(this)) {
+            Fragment fragment = StockDetailsFragment.get(stockItem.getSymbol());
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment, StockDetailsFragment.TAG)
+                    .commit();
+        } else {
+            StockDetailsActivity.start(this, stockItem.getSymbol());
         }
     }
 }

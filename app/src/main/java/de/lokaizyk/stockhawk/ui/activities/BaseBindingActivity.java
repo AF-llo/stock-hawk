@@ -6,15 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import de.lokaizyk.stockhawk.persistance.DbManager;
-
 /**
  * Created by lars on 22.10.2016
  */
-public abstract class BaseBindingActivity<T extends ViewDataBinding> extends AppCompatActivity implements Observer{
+public abstract class BaseBindingActivity<T extends ViewDataBinding> extends AppCompatActivity{
 
     private T mBinding;
 
@@ -42,22 +37,4 @@ public abstract class BaseBindingActivity<T extends ViewDataBinding> extends App
         return mBinding;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        DbManager.getInstance().unregisterForContentChange(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        DbManager.getInstance().registerForContentChange(this);
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        updateContent();
-    }
-
-    protected abstract void updateContent();
 }

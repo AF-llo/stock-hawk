@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="stocksFragment"
+            type="de.lokaizyk.stockhawk.ui.fragments.StocksFragment"/>
+    </data>
+    <LinearLayout
+        android:id="@+id/activity_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/empty_list_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_data"
+                android:visibility="@{stocksFragment.mStockItems.size() > 0 ? View.GONE : View.VISIBLE}"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/stockList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:items="@{stocksFragment.mStockItems}"
+                app:itemClickListener="@{stocksFragment}"/>
+
+        </FrameLayout>
+
+    </LinearLayout>
+</layout>

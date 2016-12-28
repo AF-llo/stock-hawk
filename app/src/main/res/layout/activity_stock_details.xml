@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <import type="de.lokaizyk.stockhawk.R"/>
-        <variable
-            name="stockDetailsActivity"
-            type="de.lokaizyk.stockhawk.ui.activities.StockDetailsActivity"/>
+
     </data>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <de.lokaizyk.stockhawk.ui.views.CustomLineChart
-            android:id="@+id/lineChart"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/line_chart_height"
-            android:layout_margin="@dimen/spacing_s"/>
-
-    </LinearLayout>
+        android:layout_height="match_parent"/>
 </layout>
