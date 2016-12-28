@@ -18,20 +18,27 @@ import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.lokaizyk.stockhawk.R;
 import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.network.api.YahooApi;
 import de.lokaizyk.stockhawk.network.api.YahooApiFactory;
+import de.lokaizyk.stockhawk.network.model.HistoricalQueryResponse;
+import de.lokaizyk.stockhawk.network.model.HistoricalQuote;
 import de.lokaizyk.stockhawk.network.model.MultiQueryResponse;
 import de.lokaizyk.stockhawk.network.model.Quote;
 import de.lokaizyk.stockhawk.network.model.SingleQueryResponse;
 import de.lokaizyk.stockhawk.persistance.DbManager;
 import de.lokaizyk.stockhawk.persistance.model.DbStock;
 import de.lokaizyk.stockhawk.ui.widget.StockDetailsWidgetProvider;
+import retrofit2.Call;
 import retrofit2.Response;
 
 /**
@@ -61,16 +68,17 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static void syncImmediately(Context context, Bundle bundle) {
+        Log.d(TAG, "syncImmediately");
         if (bundle == null) {
             bundle = new Bundle();
         }
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+        ContentResolver.requestSync(getSyncAccount(context), context.getString(R.string.content_authority), bundle);
     }
 
     public static Account getSyncAccount(Context context) {
+        Log.d(TAG, "getSyncAccount");
         // Get an instance of the Android account manager
         AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
         Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
@@ -84,6 +92,7 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     public static void initializeSyncAdapter(Context context) {
+        Log.d(TAG, "initializeSyncAdapter");
         getSyncAccount(context);
     }
 
@@ -97,12 +106,13 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account newAccount, Context context) {
+        Log.d(TAG, "onAccountCreated");
         StockHawkSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-        syncImmediately(context, null);
     }
 
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+        Log.d(TAG, "configurePeriodicSync");
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -119,26 +129,42 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void syncStocks(Bundle data) {
         boolean isUpdate = !data.containsKey(EXTRA_SYMBOL);
-        YahooApi.SymbolBuilder symbolBuilder = new YahooApi.SymbolBuilder();
+        YahooApi.QueryBuilder queryBuilder = YahooApi.QueryBuilder.currentQuery();
+        YahooApi.QueryBuilder historicalBuilder = null;
         if (isUpdate) {
             List<DbStock> dbStocks = DbManager.getInstance().loadAllCurrentStocks();
             if (dbStocks.size() == 0) {
-                symbolBuilder.addInitialSymbols();
+                historicalBuilder = getHistoricalBuilderForOneMonth();
+                queryBuilder.addInitialSymbols();
+                historicalBuilder.addInitialSymbols();
             } else {
                 for (DbStock dbStock : dbStocks) {
-                    symbolBuilder.addSymbol(dbStock.getSymbol());
+                    queryBuilder.addSymbol(dbStock.getSymbol());
                 }
             }
         } else {
+            historicalBuilder = getHistoricalBuilderForOneMonth();
             String stockInput = data.getString(EXTRA_SYMBOL);
-            symbolBuilder.addSymbol(stockInput);
+            queryBuilder.addSymbol(stockInput);
+            historicalBuilder.addSymbol(stockInput);
         }
         try {
-            Pair<Long, List<Quote>> loadedQuotes = fetchData(symbolBuilder.getSymbolCount(), symbolBuilder.buildSymbolQueryValue());
+            List<HistoricalQuote> historicalQuotes = null;
+            if (historicalBuilder != null) {
+                historicalQuotes = loadHistoricalData(historicalBuilder.buildSymbolQueryValue());
+            }
+            Pair<Long, List<Quote>> loadedQuotes = fetchData(queryBuilder.getSymbolCount(), queryBuilder.buildSymbolQueryValue());
             if (loadedQuotes.second.size() > 0) {
                 List<DbStock> stocks = new ArrayList<>();
                 for (Quote quote : loadedQuotes.second) {
                     stocks.add(StockProvider.dbStockFromQuote(quote, loadedQuotes.first));
+                }
+                if (historicalQuotes != null) {
+                    List<DbStock> historicalStocks = new ArrayList<>();
+                    for (HistoricalQuote historicalQuote : historicalQuotes) {
+                        historicalStocks.add(StockProvider.dbStockFromHistoricalQuote(historicalQuote));
+                    }
+                    DbManager.getInstance().insertOrReplace(historicalStocks);
                 }
                 DbManager.getInstance().insertOrReplace(stocks);
                 DbManager.getInstance().notifyObserver();
@@ -151,6 +177,23 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
         } catch (IOException e) {
             Log.e(TAG, "Error loading data from Backend", e);
         }
+    }
+
+    private YahooApi.QueryBuilder getHistoricalBuilderForOneMonth() {
+        DateTime end = DateTime.now().minusDays(1);
+        DateTime start = end.minusMonths(1);
+        return YahooApi.QueryBuilder.historicalQuery(
+                start.toString(DateTimeFormat.forPattern(StockProvider.HISTORICAL_QUOTE_DATE_PATTERN)),
+                end.toString(DateTimeFormat.forPattern(StockProvider.HISTORICAL_QUOTE_DATE_PATTERN)));
+    }
+
+    private List<HistoricalQuote> loadHistoricalData(String query) throws IOException {
+        Call<HistoricalQueryResponse> historicalQuery = mYahooApi.loadHistoricalStocks(query);
+        Response<HistoricalQueryResponse> historicalResponse = historicalQuery.execute();
+        if (historicalResponse == null || historicalResponse.body() == null) {
+            return Collections.emptyList();
+        }
+        return historicalResponse.body().getQuery().getResults().getQuote();
     }
 
     public static void updateWidgets(Context context) {

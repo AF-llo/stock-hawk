@@ -4,11 +4,15 @@ import android.support.annotation.Nullable;
 
 import com.github.mikephil.charting.data.Entry;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
+import de.lokaizyk.stockhawk.network.model.HistoricalQuote;
 import de.lokaizyk.stockhawk.network.model.Quote;
 import de.lokaizyk.stockhawk.persistance.DbManager;
 import de.lokaizyk.stockhawk.persistance.model.DbStock;
@@ -28,6 +32,12 @@ public class StockProvider {
     public static void toggleShowPercent() {
         showPercent = !showPercent;
     }
+
+    private static final String DEFAULT_CHANGE = "+0.00";
+
+    private static final String DEFAULT_CHANGE_INPERCENT = DEFAULT_CHANGE + "%";
+
+    public static final String HISTORICAL_QUOTE_DATE_PATTERN = "yyyy-MM-dd";
 
     public static List<StockItemViewModel> loadCurrentStocksFromDb() {
         List<DbStock> currentStocks = DbManager.getInstance().loadAllCurrentStocks();
@@ -86,6 +96,22 @@ public class StockProvider {
         dbStock.setCreated(time);
         dbStock.setIsUp(quote.getChange().charAt(0) != '-');
         dbStock.setIsCurrent(true);
+        return dbStock;
+    }
+
+    @Nullable
+    public static DbStock dbStockFromHistoricalQuote(HistoricalQuote historicalQuote) {
+        if (historicalQuote == null) {
+            return null;
+        }
+        DbStock dbStock = new DbStock();
+        dbStock.setSymbol(historicalQuote.getSymbol());
+        dbStock.setChange(DEFAULT_CHANGE);
+        dbStock.setPercentChange(DEFAULT_CHANGE_INPERCENT);
+        dbStock.setBidprice(String.format(Locale.US, "%.2f", Float.parseFloat(historicalQuote.getClose())));
+        dbStock.setCreated(DateTime.parse(historicalQuote.getDate(), DateTimeFormat.forPattern(HISTORICAL_QUOTE_DATE_PATTERN)).getMillis());
+        dbStock.setIsUp(true);
+        dbStock.setIsCurrent(false);
         return dbStock;
     }
 
