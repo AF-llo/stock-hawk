@@ -12,4 +12,8 @@
     <string name="no_data">No data available</string>
     <string name="stock_exists">This stock is already saved!</string>
     <string name="add_stock">Add stock</string>
+    <string name="titel_widget_stock">Current stocks</string>
+
+    <string name="content_authority">de.lokaizyk.stockhawk.app</string>
+    <string name="sync_account_type">stockhawk.lokaizyk.de</string>
 </resources>

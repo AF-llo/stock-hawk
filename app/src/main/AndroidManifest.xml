@@ -2,8 +2,11 @@
 <manifest package="de.lokaizyk.stockhawk"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 
     <application
         android:allowBackup="true"
@@ -26,14 +29,44 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.activities.MainActivity" />
         </activity>
-        <service android:name=".app.service.StockIntentService"/>
-        <service android:name=".app.service.StockTaskService"
-                 android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
-                 android:exported="true">
+
+        <service
+            android:name=".app.sync.StockHawkAuthenticatorService"
+            >
             <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
         </service>
+        <service
+            android:name=".app.sync.StockHawkSyncService"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+        <provider
+            android:authorities="@string/content_authority"
+            android:name=".app.sync.StockStubProvider"
+            android:exported="false"
+            android:syncable="true" />
+
+        <receiver
+            android:name=".ui.widget.StockWidgetProvider"
+            android:label="@string/titel_widget_stock">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_stocks_info"/>
+        </receiver>
     </application>
 
 </manifest>

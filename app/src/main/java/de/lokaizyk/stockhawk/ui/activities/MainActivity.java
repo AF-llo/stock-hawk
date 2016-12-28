@@ -11,8 +11,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import de.lokaizyk.stockhawk.R;
-import de.lokaizyk.stockhawk.app.service.StockIntentService;
-import de.lokaizyk.stockhawk.app.service.StockTaskService;
+import de.lokaizyk.stockhawk.app.sync.StockHawkSyncAdapter;
 import de.lokaizyk.stockhawk.databinding.ActivityMainBinding;
 import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
@@ -37,17 +36,13 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
         if (savedInstanceState == null){
             updateContent();
             // Run the initialize task service so that some stocks appear upon an empty database
-            if (isConnected){
-                StockIntentService.initialize(this);
-            } else{
+            if (!isConnected){
                 DeviceUtil.noNetworkToast(this);
             }
         } else {
             mStockItems = (ObservableArrayList) savedInstanceState.getParcelableArrayList(EXTRAS_STOCKS);
         }
-        if (isConnected) {
-            StockTaskService.runPeriodic(this);
-        }
+        StockHawkSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
@@ -113,7 +108,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
                         if (StockProvider.loadStockFromDb(symbol) != null) {
                             Toast.makeText(MainActivity.this, getString(R.string.stock_exists), Toast.LENGTH_LONG).show();
                         } else {
-                            StockIntentService.addSymbol(this, symbol);
+                            StockHawkSyncAdapter.addSymbol(this, symbol);
                         }
                     })
                     .show();
