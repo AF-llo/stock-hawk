@@ -190,7 +190,7 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
     private List<HistoricalQuote> loadHistoricalData(String query) throws IOException {
         Call<HistoricalQueryResponse> historicalQuery = mYahooApi.loadHistoricalStocks(query);
         Response<HistoricalQueryResponse> historicalResponse = historicalQuery.execute();
-        if (historicalResponse == null || historicalResponse.body() == null) {
+        if (historicalResponse == null || historicalResponse.body() == null || historicalResponse.body().getQuery().getResults() == null ) {
             return Collections.emptyList();
         }
         return historicalResponse.body().getQuery().getResults().getQuote();
