@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="PercentChangeTextStyle">
+    <style name="LargeTextStyle">
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold</item>
@@ -16,10 +16,15 @@
 
     <style name="BidPriceTextStyle">
         <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="StockSymbolTextStyle">
+    <style name="HugeTextStyle">
         <item name="android:textSize">@dimen/text_size_extra_large</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="StockSymbolTextStyle" parent="HugeTextStyle">
         <item name="android:textAllCaps">true</item>
     </style>
 </resources>
