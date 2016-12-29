@@ -86,6 +86,8 @@ public class StocksFragment extends BaseBindingFragment<FragmentStocksBinding> i
                 activeItem.isActive.set(true);
                 ((Callback)getActivity()).onStockSelected(item);
             }
+        } else {
+            ((Callback)getActivity()).onStockSelected(item);
         }
     }
 
