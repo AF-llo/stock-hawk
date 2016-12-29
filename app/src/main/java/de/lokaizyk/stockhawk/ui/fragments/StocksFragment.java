@@ -66,6 +66,9 @@ public class StocksFragment extends BaseBindingFragment<FragmentStocksBinding> i
     }
 
     public void selectItem(String symbol) {
+        if (activeItem != null) {
+            symbol = activeItem.getSymbol();
+        }
         StockItemViewModel item = getItem(symbol);
         if (item != null) {
             onItemClicked(item);
