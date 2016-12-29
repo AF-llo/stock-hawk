@@ -169,10 +169,6 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
                 DbManager.getInstance().insertOrReplace(stocks);
                 DbManager.getInstance().notifyObserver();
                 updateWidgets(getContext());
-            } else {
-                if (getContext() != null) {
-                    toastOnMainThread(getContext().getString(R.string.stock_not_found));
-                }
             }
         } catch (IOException e) {
             Log.e(TAG, "Error loading data from Backend", e);
@@ -218,6 +214,16 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
             Quote quote = response.body().getQuery().getResults().getQuote();
             if (isValidStock(quote)) {
                 quotes.add(quote);
+            } else {
+                if (invalidStockData(quote)) {
+                    if (getContext() != null) {
+                        toastOnMainThread(getContext().getString(R.string.invalid_stock_data));
+                    }
+                } else {
+                    if (getContext() != null) {
+                        toastOnMainThread(getContext().getString(R.string.stock_not_found));
+                    }
+                }
             }
             time = response.body().getQuery().getCreated().getTime();
         }
@@ -231,7 +237,11 @@ public class StockHawkSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private boolean isValidStock(Quote quote    ) {
+    private boolean isValidStock(Quote quote) {
         return !TextUtils.isEmpty(quote.getBid()) && !TextUtils.isEmpty(quote.getChange()) && !TextUtils.isEmpty(quote.getChangeinPercent());
+    }
+
+    private boolean invalidStockData(Quote quote) {
+        return TextUtils.isEmpty(quote.getBid()) && !TextUtils.isEmpty(quote.getChange()) && !TextUtils.isEmpty(quote.getChangeinPercent());
     }
 }
