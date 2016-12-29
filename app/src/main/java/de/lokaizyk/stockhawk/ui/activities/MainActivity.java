@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -28,7 +29,7 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
 
     public static Intent getIntent(Context context, String symbol) {
         Intent intent = new Intent(context, MainActivity.class);
-        if (intent != null) {
+        if (symbol != null) {
             intent.putExtra(StockDetailsActivity.EXTRA_SYMBOL, symbol);
         }
         return intent;
@@ -39,11 +40,10 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
         super.onCreate(savedInstanceState);
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.containsKey(StockDetailsActivity.EXTRA_SYMBOL)) {
-            String symbol = extras.getString(StockDetailsActivity.EXTRA_SYMBOL);
-            if (!TextUtils.isEmpty(symbol)) {
-                StockItemViewModel selectedItem = new StockItemViewModel();
-                selectedItem.setSymbol(symbol);
-                onStockSelected(selectedItem);
+            String symmbol = extras.getString(StockDetailsActivity.EXTRA_SYMBOL);
+            if (!TextUtils.isEmpty(symmbol)) {
+                StocksFragment fragment = (StocksFragment) getSupportFragmentManager().findFragmentById(R.id.stocks_fragment);
+                fragment.selectItem(symmbol);
             }
         }
     }
@@ -107,6 +107,17 @@ public class MainActivity extends BaseBindingActivity<ActivityMainBinding> imple
                     .commit();
         } else {
             StockDetailsActivity.start(this, stockItem.getSymbol());
+        }
+    }
+
+    @Override
+    public void onStockDeleted(StockItemViewModel stockItem) {
+        if (stockItem != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            StockDetailsFragment fragment = (StockDetailsFragment) fragmentManager.findFragmentByTag(StockDetailsFragment.TAG);
+            if (fragment != null) {
+                fragmentManager.beginTransaction().remove(fragment).commit();
+            }
         }
     }
 }

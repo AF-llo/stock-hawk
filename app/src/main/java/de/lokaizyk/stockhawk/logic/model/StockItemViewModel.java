@@ -1,5 +1,6 @@
 package de.lokaizyk.stockhawk.logic.model;
 
+import android.databinding.ObservableBoolean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -20,6 +21,10 @@ public class StockItemViewModel implements Parcelable {
     private String change = "";
 
     private String percentChange = "";
+
+    public ObservableBoolean isSelected = new ObservableBoolean(false);
+
+    public ObservableBoolean isActive = new ObservableBoolean(false);
 
     public long getId() {
         return id;
@@ -76,12 +81,14 @@ public class StockItemViewModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(id);
+        dest.writeLong(this.id);
         dest.writeByte(this.isUp ? (byte) 1 : (byte) 0);
         dest.writeString(this.symbol);
         dest.writeString(this.price);
         dest.writeString(this.change);
         dest.writeString(this.percentChange);
+        dest.writeParcelable(this.isSelected, flags);
+        dest.writeParcelable(this.isActive, flags);
     }
 
     public StockItemViewModel() {
@@ -94,9 +101,11 @@ public class StockItemViewModel implements Parcelable {
         this.price = in.readString();
         this.change = in.readString();
         this.percentChange = in.readString();
+        this.isSelected = in.readParcelable(ObservableBoolean.class.getClassLoader());
+        this.isActive = in.readParcelable(ObservableBoolean.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<StockItemViewModel> CREATOR = new Parcelable.Creator<StockItemViewModel>() {
+    public static final Creator<StockItemViewModel> CREATOR = new Creator<StockItemViewModel>() {
         @Override
         public StockItemViewModel createFromParcel(Parcel source) {
             return new StockItemViewModel(source);

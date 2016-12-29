@@ -22,8 +22,11 @@ import de.lokaizyk.stockhawk.util.DeviceUtil;
 public class StocksFragment extends BaseBindingFragment<FragmentStocksBinding> implements BaseBindingRecyclerAdapter.OnItemClickListener<StockItemViewModel> {
 
     public static final String EXTRAS_STOCKS = "extraStocks";
+    private static final String EXTRAS_ACTIVE_ITEM = "extraActiveItem";
 
     public ObservableArrayList<StockItemViewModel> mStockItems = new ObservableArrayList<>();
+
+    private StockItemViewModel activeItem;
 
     @Override
     protected int getLayoutId() {
@@ -50,6 +53,7 @@ public class StocksFragment extends BaseBindingFragment<FragmentStocksBinding> i
             }
         } else {
             mStockItems = (ObservableArrayList) savedInstanceState.getParcelableArrayList(EXTRAS_STOCKS);
+            activeItem = savedInstanceState.getParcelable(EXTRAS_ACTIVE_ITEM);
         }
         StockHawkSyncAdapter.initializeSyncAdapter(getContext());
     }
@@ -57,21 +61,60 @@ public class StocksFragment extends BaseBindingFragment<FragmentStocksBinding> i
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(EXTRAS_STOCKS, mStockItems);
+        outState.putParcelable(EXTRAS_ACTIVE_ITEM, activeItem);
         super.onSaveInstanceState(outState);
     }
 
+    public void selectItem(String symbol) {
+        StockItemViewModel item = getItem(symbol);
+        if (item != null) {
+            onItemClicked(item);
+        }
+    }
+
     @Override
-    public void onItemClicked(StockItemViewModel item, int position) {
-        ((Callback)getActivity()).onStockSelected(item);
+    public void onItemClicked(StockItemViewModel item) {
+        if (DeviceUtil.isTablet(getContext())) {
+            if (!item.isActive.get()) {
+                if (activeItem != null) {
+                    activeItem.isActive.set(false);
+                }
+                activeItem = item;
+                activeItem.isActive.set(true);
+                ((Callback)getActivity()).onStockSelected(item);
+            }
+        }
+    }
+
+    @Override
+    public void onItemDeleted(StockItemViewModel item) {
+        if (activeItem != null) {
+            activeItem.isActive.set(false);
+            activeItem = null;
+        }
+        ((Callback)getActivity()).onStockDeleted(item);
+    }
+
+    private StockItemViewModel getItem(String symbol) {
+        for (StockItemViewModel stockItem : mStockItems) {
+            if (stockItem.getSymbol().equals(symbol)) {
+                return stockItem;
+            }
+        }
+        return null;
     }
 
     @Override
     public void updateContent() {
         mStockItems.clear();
         mStockItems.addAll(StockProvider.loadCurrentStocksFromDb());
+        if (activeItem != null) {
+            selectItem(activeItem.getSymbol());
+        }
     }
 
     public interface Callback {
         void onStockSelected(StockItemViewModel stockItem);
+        void onStockDeleted(StockItemViewModel stockItem);
     }
 }

@@ -35,6 +35,9 @@ public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter
             mItems.remove(position);
             notifyItemRemoved(position);
             onItemDeleted(item);
+            if (mOnItemClickListener != null) {
+                mOnItemClickListener.onItemDeleted(item);
+            }
         }
     }
 
@@ -47,7 +50,7 @@ public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter
         holder.bindItemItem(item);
         if (mOnItemClickListener != null){
             View view = holder.itemView;
-            view.setOnClickListener(v -> mOnItemClickListener.onItemClicked(item, holder.getAdapterPosition()));
+            view.setOnClickListener(v -> mOnItemClickListener.onItemClicked(item));
         }
     }
 
@@ -57,6 +60,7 @@ public abstract class BaseBindingRecyclerAdapter<T> extends RecyclerView.Adapter
     }
 
     public interface OnItemClickListener<T> {
-        void onItemClicked(T item, int position);
+        void onItemClicked(T item);
+        void onItemDeleted(T item);
     }
 }

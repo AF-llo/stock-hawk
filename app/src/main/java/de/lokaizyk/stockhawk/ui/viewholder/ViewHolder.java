@@ -6,10 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import de.lokaizyk.stockhawk.util.ItemTouchHelperAdapter;
+
 /**
  * Created by lars on 03.10.16.
  */
-public abstract class ViewHolder<T> extends RecyclerView.ViewHolder {
+public abstract class ViewHolder<T> extends RecyclerView.ViewHolder implements ItemTouchHelperAdapter {
 
     protected ViewDataBinding mBinding;
 

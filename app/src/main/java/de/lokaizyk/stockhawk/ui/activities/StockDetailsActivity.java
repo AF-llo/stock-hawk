@@ -24,6 +24,8 @@ public class StockDetailsActivity extends BaseBindingActivity<ActivityStockDetai
 
     public static final String EXTRA_ENTRIES = "extraEntries";
 
+    public static final String EXTRA_POSITION = "extraPosition";
+
     public static void start(Context context, String symbol) {
         if (context != null && !TextUtils.isEmpty(symbol)) {
             Intent intent = new Intent(context, StockDetailsActivity.class);
