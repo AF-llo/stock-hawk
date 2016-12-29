@@ -13,7 +13,9 @@ import de.lokaizyk.stockhawk.R;
 import de.lokaizyk.stockhawk.logic.StockProvider;
 import de.lokaizyk.stockhawk.logic.model.StockItemViewModel;
 import de.lokaizyk.stockhawk.persistance.DbManager;
+import de.lokaizyk.stockhawk.ui.activities.MainActivity;
 import de.lokaizyk.stockhawk.ui.activities.StockDetailsActivity;
+import de.lokaizyk.stockhawk.util.DeviceUtil;
 
 /**
  * Created by lars on 28.12.16.
@@ -67,8 +69,11 @@ public class StockDetailsViewsFactory implements RemoteViewsService.RemoteViewsF
         views.setTextViewText(R.id.change, item.getChange());
         views.setInt(R.id.change, "setBackgroundResource", item.isUp() ? R.color.material_green_700 : R.color.material_red_700);
 
-        // TODO: 28.12.16 handle when started on tablet
-        views.setOnClickFillInIntent(R.id.stock_list_item, StockDetailsActivity.getIntent(item.getSymbol()));
+        if (DeviceUtil.isTablet(mContext)) {
+            views.setOnClickFillInIntent(R.id.stock_list_item, StockDetailsActivity.getIntent(item.getSymbol()));
+        } else {
+            views.setOnClickFillInIntent(R.id.stock_list_item, MainActivity.getIntent(mContext, item.getSymbol()));
+        }
         return views;
     }
 

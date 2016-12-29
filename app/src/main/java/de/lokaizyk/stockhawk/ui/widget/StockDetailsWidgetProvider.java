@@ -15,6 +15,7 @@ import android.widget.RemoteViews;
 import de.lokaizyk.stockhawk.R;
 import de.lokaizyk.stockhawk.ui.activities.MainActivity;
 import de.lokaizyk.stockhawk.ui.activities.StockDetailsActivity;
+import de.lokaizyk.stockhawk.util.DeviceUtil;
 
 /**
  * Created by lars on 28.12.16.
@@ -34,8 +35,7 @@ public class StockDetailsWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.layout_stock_widget);
 
             // Create an Intent to launch MainActivity
-            Intent intent = new Intent(context, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, MainActivity.getIntent(context, null), 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
             // Set up the collection
@@ -44,13 +44,17 @@ public class StockDetailsWidgetProvider extends AppWidgetProvider {
             } else {
                 setRemoteAdapterV11(context, views);
             }
-            Intent clickIntentTemplate = new Intent(context, StockDetailsActivity.class);
-            PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
-                    .addNextIntentWithParentStack(clickIntentTemplate)
-                    .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setPendingIntentTemplate(R.id.widget_list, clickPendingIntentTemplate);
+            Intent clickIntentTemplate;
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            if (!DeviceUtil.isTablet(context)) {
+                clickIntentTemplate = new Intent(context, StockDetailsActivity.class);
+                stackBuilder.addNextIntentWithParentStack(clickIntentTemplate);
+            } else {
+                clickIntentTemplate = new Intent(context, MainActivity.class);
+                stackBuilder.addNextIntent(clickIntentTemplate);
+            }
+            views.setPendingIntentTemplate(R.id.widget_list, stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
             views.setEmptyView(R.id.widget_list, R.id.widget_empty);
-            // TODO: 28.12.16 handle when started no tablet
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
