@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:foreground="@drawable/stock_item_background"
+        android:contentDescription="@{context.getString(R.string.select) + stockItem.symbol}"
         android:background="@{stockItem.isSelected || stockItem.isActive ? @color/material_blue_grey_700 : @color/background_grey}">
 
         <LinearLayout
